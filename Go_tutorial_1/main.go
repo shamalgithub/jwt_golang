@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"errors"
 	"net/http"
 	"github.com/gin-gonic/gin"
@@ -78,10 +79,43 @@ func getTodosbyId(id string)(*todo , error){
 	return nil , errors.New("todo item not found")
 }
 
+// func middlewareFunc1(c *gin.Context) {
+// 	fmt.Println("middlewareFunc1 running")
+// 	// Next should be used only inside middleware.
+// 	//It executes the pending handlers in the chain inside the calling handler.
+// 	// example := "hello world"
+// 	// return example
+// 	c.Next()
+// }
+
+// func middlewareFunc2(c *gin.Context) {
+// 	fmt.Println("middlewareFunc2 running")
+// 	// Abort prevents pending handlers from being called
+// 	// c.Abort()
+// 	fmt.Println("middlewareFunc2 ending")
+// 	c.Next()
+// }
+
+func middlewareFunc3() gin.HandlerFunc {
+	// run one time logic could inserted here
+
+	
+	return func(c *gin.Context) {
+		fmt.Println("middlewareFunc3 running")
+		c.Next()
+	
+	}
+}
 
 func main(){
 	
-	router := gin.Default()
+	router := gin.New()
+	router.Use(gin.Logger())
+
+	// Recovery middleware recovers from any panics and writes a 500 if there was one.
+	router.Use(gin.Recovery())
+	router.Use( middlewareFunc3())
+
 	router.GET("/todo" , getTodos)
 	router.POST("/post-todos" , addTodos)
 	router.GET("/todo/:id" , todoById)
